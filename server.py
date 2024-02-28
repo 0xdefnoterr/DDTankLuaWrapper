@@ -12,7 +12,10 @@ script = None
 isDumping = False
 
 
+game_name = "com.wan.ddten"
+
 '''
+Script execution part
 Post request to /loadbuffer with the following json example:
 {
 	'scriptName': 'sum.lua',
@@ -36,8 +39,12 @@ def loadbuffer():
         print('Script is None')
         return jsonify({'status': 'Script is None'})
     
-    script.exports.execlua(scriptToLoad, size, scriptName);
+    script.exports.execute_lua(scriptToLoad, size, scriptName);
     return jsonify({'status': 'Sent to frida'})
+
+"""
+Dumping lua code part
+"""
 
 def savefile(path, data):
     try:
@@ -70,9 +77,9 @@ def dumpLuaCode(message, data):
 def dumpCode():
     global isDumping, script
     device = frida.get_usb_device()
-    pid = device.spawn(['com.wan.ddten'])
+    pid = device.spawn([game_name])
     session = device.attach(pid)
-    with open('luaL_loadbuffer.js') as f:
+    with open('dump_lua.js') as f:
         sourceDump = f.read()
     script = session.create_script(sourceDump)
     script.on('message', dumpLuaCode)
@@ -123,16 +130,19 @@ def loadScript():
         print(f"Error getting device: {e}")
         return jsonify({'status': 'Error getting device'})
     
-    pid = device.spawn(['com.wan.ddten'])
+    pid = device.spawn([game_name])
     session = device.attach(pid)
-    with open('luaState.js') as f:
+
+    with open('main.js') as f:
         source = f.read()
+
     script = session.create_script(source)
     script.on('message', on_message)
     script.load()
     device.resume(pid)
     print('Script loaded')
     return jsonify({'status': 'Script loaded'})
+
 
 
 @app.route('/', methods=['GET'])
