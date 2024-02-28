@@ -101,7 +101,7 @@ def on_message(message, data):
             status = payload['status']
             socketio.emit('status', {'scriptName': scriptName, 'statusMessage': status})
         
-        if payload.get('type') == 'dumpStack':
+        if payload.get('type') == 'dump_stack':
             index = payload['index']
             value = payload['value']
             vtype = payload['vType']
