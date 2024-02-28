@@ -1,0 +1,3 @@
+frida
+flask
+flask_socketio
